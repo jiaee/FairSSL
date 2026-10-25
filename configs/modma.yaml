@@ -1,0 +1,58 @@
+wandb:
+  api_key: "${WANDB_API_KEY}"
+  project_prefix: "modma_fairwell"
+  agent_count: 7
+
+paths:
+  save_root: "${MODMA_RESULTS_DIR}"
+  model_save_dir: "saved_models"
+  train_base_dir_eeg: "${MODMA_EEG_DIR}"
+  train_base_dir_audio: "${MODMA_AUDIO_DIR}"
+  val_base_dir_eeg: "${MODMA_EEG_DIR}"
+  val_base_dir_audio: "${MODMA_AUDIO_DIR}"
+
+data:
+  train_eeg_aug_list: ["FTSurrogate_eeg_10sec_segments", "FrequencyShift_eeg_10sec_segments", "SmoothTimeMask_eeg_10sec_segments"]
+  train_audio_aug_list: ["reshaped_AddNoise_audio", "reshaped_AdjustVolume_audio", "reshaped_BandpassFilter_audio"]
+  val_eeg_aug_list: []
+  val_audio_aug_list: []
+
+final:
+  seed_values: [42]
+
+sweep:
+  method: "bayes"
+  metric:
+    name: "val_auc"
+    goal: "maximize"
+  parameters:
+    subjects_per_batch:
+      value: 2
+    epoch:
+      value: 20
+    patience:
+      value: 20
+    probe_epochs:
+      value: 5
+    learning_rate:
+      distribution: "log_uniform_values"
+      min: 3e-4
+      max: 1e-3
+    linear_lr:
+      distribution: "log_uniform_values"
+      min: 3e-3
+      max: 1e-2
+    weight_decay:
+      value: 1e-4
+    mlp:
+      value: "512-256-1024"
+    sim_coeff:
+      value: 25.0
+    std_coeff:
+      value: 25.0
+    cov_coeff:
+      value: 1.0
+
+runs:
+  loss_family: "vicreg"
+  loss_types: ["M1", "M2", "M3", "M4"]

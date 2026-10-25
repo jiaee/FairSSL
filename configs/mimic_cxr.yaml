@@ -1,0 +1,86 @@
+selected:
+  dataset: "mimic_cxr"
+  loss_family: "vicreg"
+  loss_type: "M3"
+  pool_modality: "image"
+  run_as_sweep: true
+
+wandb:
+  api_key: "${WANDB_API_KEY}"
+  username: "${WANDB_USERNAME}"
+  entity: "${WANDB_ENTITY}"
+
+projects:
+  M1: "m1v6_mcxr"
+  M2: "m2v6_mcxr"
+  M3: "m3v6_mcxr"
+  M4: "m4v6_mcxr"
+
+paths:
+  mimic_root: "${MIMIC_CXR_ROOT}"
+  local_results_dir: "${MIMIC_CXR_RESULTS_DIR}"
+  text_cache_path: "${MIMIC_CXR_TEXT_CACHE}"
+  official_subdir: "official_data_iccv_final"
+  cxr_record_list_csv: "${MIMIC_CXR_RECORD_LIST_CSV}"
+  train_aug_csv: "${MIMIC_CXR_TRAIN_AUG_CSV}"
+  val_aug_csv: "${MIMIC_CXR_VAL_AUG_CSV}"
+  test_aug_csv: "${MIMIC_CXR_TEST_AUG_CSV}"
+  admissions_csv: "${MIMIC_CXR_ADMISSIONS_CSV}"
+  patients_csv: "${MIMIC_CXR_PATIENTS_CSV}"
+  pathology_labels_csv: ""
+
+defaults:
+  dataset_name: "mimic_cxr"
+  loss_family: "vicreg"
+  loss_type: "M3"
+  pool_modality: "image"
+  lr: 1e-4
+  wd: 1e-5
+  ssl_epochs: 5
+  probe_epochs: 25
+  probe_lr: 3e-4
+  probe_wd: 1e-5
+  batch_size: 256
+  max_items_per_subject: 0
+  max_pairs_per_subject: null
+  pairs_per_subject: "all"
+  task: "no_finding"
+  num_workers: 4
+  seed: 42
+  mlp: "512-256-1024"
+  sim_coeff: 25.0
+  std_coeff: 25.0
+  cov_coeff: 1.0
+
+sweep:
+  method: "grid"
+  metric:
+    name: "val_auc"
+    goal: "maximize"
+  parameters:
+    ssl_epochs:
+      values: [5, 20]
+    probe_epochs:
+      values: [25, 50]
+    lr:
+      values: [1e-4, 5e-4]
+    wd:
+      values: [1e-5]
+    probe_lr:
+      values: [3e-4, 3e-3]
+    probe_wd:
+      values: [1e-5]
+    batch_size:
+      value: 256
+    max_items_per_subject:
+      value: 0
+    max_pairs_per_subject:
+      value: null
+    pairs_per_subject:
+      value: "all"
+    task:
+      values: ["no_finding"]
+    num_workers:
+      value: 4
+    seed:
+      value: 42

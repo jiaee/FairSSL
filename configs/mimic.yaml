@@ -1,0 +1,54 @@
+wandb:
+  api_key: "${WANDB_API_KEY}"
+  project: "mimic_sweep"
+
+paths:
+  train_path: "${MIMIC_TRAIN_PATH}"
+  val_path: "${MIMIC_VAL_PATH}"
+  test_path: "${MIMIC_TEST_PATH}"
+
+defaults:
+  seed: 42
+  batch_size: 32
+  mlp: "512-256-1024"
+  epochs_ssl: 10
+  lr_ssl: 1e-4
+  sim_coeff: 25.0
+  std_coeff: 25.0
+  cov_coeff: 1.0
+  epochs_ft: 10
+  lr_ft: 0.03
+  log_every: 20
+  loss_family: "vicreg"
+  loss_type: "M1"
+
+sweep:
+  method: "grid"
+  metric:
+    name: "val_auc"
+    goal: "maximize"
+  parameters:
+    seed:
+      value: 42
+    loss_family:
+      value: "vicreg"
+    loss_type:
+      values: ["M1", "M2", "M3", "M4"]
+    batch_size:
+      value: 128
+    epochs_ssl:
+      value: 60
+    epochs_ft:
+      value: 20
+    lr_ssl:
+      values: [3e-4, 1e-3]
+    lr_ft:
+      values: [0.03, 0.3]
+    sim_coeff:
+      value: 25.0
+    std_coeff:
+      value: 25.0
+    cov_coeff:
+      value: 1.0
+    mlp:
+      value: "512-256-1024"
